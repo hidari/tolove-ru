@@ -2,8 +2,14 @@
 name = "tolove-ru"
 version = "0.1.0"
 edition = "2021"
+authors = ["Hidari <ika5140+github@gmail.com>"]
 description = "A lovely terminal heart animation."
+repository = "https://github.com/hidari/tolove-ru"
+documentation = "https://github.com/hidari/tolove-ru#readme"
+keywords = ["terminal", "animation", "heart", "ascii-art", "fun"]
+categories = ["command-line-utilities", "visualization"]
 license = "MIT"
+readme = "README.md"
 
 [[bin]]
 name = "love"
