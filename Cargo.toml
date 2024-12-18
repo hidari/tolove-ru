@@ -1,0 +1,15 @@
+[package]
+name = "tolove-ru"
+version = "0.1.0"
+edition = "2021"
+description = "A lovely terminal heart animation."
+license = "MIT"
+
+[[bin]]
+name = "love"
+path = "src/main.rs"
+
+[dependencies]
+crossterm = "0.28.1"
+ctrlc = "3.4.5"
+clap = { version = "4.5.23", features = ["derive"] }
