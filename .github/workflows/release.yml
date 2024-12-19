@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Get version from tag (build)
+      - name: Get version from tag
         id: build_version
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
@@ -58,6 +58,7 @@ jobs:
           sed -i.bak "s/^version = \".*\"/version = \"${{ steps.build_version.outputs.VERSION }}\"/" Cargo.toml
 
       - name: Setup Git
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
@@ -119,14 +120,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.repository.default_branch }}
 
-      - name: Get version from tag (publish)
-        id: publish_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-      - name: Update version in Cargo.toml
-        run: |
-          sed -i "s/^version = \".*\"/version = \"${{ steps.publish_version.outputs.VERSION }}\"/" Cargo.toml
+      - name: Pull latest changes
+        run: git pull origin ${{ github.event.repository.default_branch }}
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
@@ -143,6 +142,10 @@ jobs:
         run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Get version from tag
+        id: publish_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
