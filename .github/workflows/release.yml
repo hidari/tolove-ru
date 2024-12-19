@@ -128,6 +128,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Update version in Cargo.toml
+        run: |
+          sed -i "s/^version = \".*\"/version = \"${{ steps.get_version.outputs.VERSION }}\"/" Cargo.toml
+
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
