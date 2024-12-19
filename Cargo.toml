@@ -10,13 +10,11 @@ keywords = ["terminal", "animation", "heart", "ascii-art", "fun"]
 categories = ["command-line-utilities", "visualization"]
 license = "MIT"
 readme = "README.md"
-exclude = [
-    "assets/",
-    "*.tar.gz",
-    "*.zip",
-    "target/",
-    ".github/",
-    ".git/",
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE"
 ]
 
 [[bin]]
