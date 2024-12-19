@@ -64,9 +64,17 @@ jobs:
       - name: Commit version update
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
+          # Get default branch name
+          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+          
+          # Checkout the default branch
+          git fetch origin $DEFAULT_BRANCH
+          git checkout $DEFAULT_BRANCH
+          
+          # Update version and commit
           git add Cargo.toml
           git commit -m "chore: bump version to ${{ steps.get_version.outputs.VERSION }}"
-          git push
+          git push origin $DEFAULT_BRANCH
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
