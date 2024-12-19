@@ -8,6 +8,12 @@ Watch a heart float up in your terminal with optional messages inside!
 
 ## Installation
 
+### Pre-built binaries
+
+You can download pre-built binaries for various platforms from the [GitHub releases page](https://github.com/hidari/tolove-ru/releases).
+
+### From source
+
 ```bash
 cargo install tolove-ru
 ```
