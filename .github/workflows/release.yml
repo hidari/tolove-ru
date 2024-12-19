@@ -55,7 +55,7 @@ jobs:
       - name: Update version in Cargo.toml
         shell: bash
         run: |
-          sed -i.bak "s/^version = \".*\"/version = \"${{ steps.build_version.outputs.VERSION }}\"/" Cargo.toml
+          sed -i -e "s/^version = \".*\"/version = \"${{ steps.build_version.outputs.VERSION }}\"/" Cargo.toml
 
       - name: Setup Git
         if: matrix.target == 'x86_64-unknown-linux-gnu'

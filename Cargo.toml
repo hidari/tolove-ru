@@ -11,6 +11,7 @@ categories = ["command-line-utilities", "visualization"]
 license = "MIT"
 readme = "README.md"
 exclude = [
+    "assets/",
     "*.tar.gz",
     "*.zip",
     "target/",
