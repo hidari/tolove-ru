@@ -1,4 +1,4 @@
-# tolove-ru
+# ToLOVE-ru
 
 A lovely terminal heart animation (pronounced as "trouble") 💜
 
