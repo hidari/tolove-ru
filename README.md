@@ -4,6 +4,8 @@ A lovely terminal heart animation (pronounced as "trouble") 💜
 
 Watch a heart float up in your terminal with optional messages inside!
 
+![demo.gif](assets/demo.gif)
+
 ## Installation
 
 ```bash
