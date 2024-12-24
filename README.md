@@ -29,6 +29,7 @@ love
 
 - `--message <TEXT>` - Display a message inside the heart
 - `--petite` - Show a smaller heart
+- `--color <COLOR>` - Change the heart color (available: red, green, blue, yellow, magenta, cyan, white)
 - `-h, --help` - Show help message
 
 ### Examples
@@ -46,6 +47,11 @@ love --message "I love Rust"
 Small heart:
 ```bash
 love --petite
+```
+
+Colorful heart:
+```bash
+love --color red
 ```
 
 ## License

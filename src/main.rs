@@ -6,6 +6,7 @@ use crossterm::{
     cursor::{Hide, MoveTo, RestorePosition, SavePosition, Show},
     execute,
     terminal::{size, EnterAlternateScreen, LeaveAlternateScreen},
+    style::{ SetForegroundColor,Color, ResetColor, },
 };
 use std::io::stdout;
 use std::io::Result;
@@ -23,6 +24,9 @@ struct Options {
 
     #[clap(long)]
     petite: bool,
+
+    #[clap(long, default_value = "white")]
+    color: String,
 }
 
 fn main() -> Result<()> {
@@ -78,6 +82,21 @@ fn draw_love_row_with_message(y: i32, options: &Options) -> Result<bool> {
         print!(" ");
     }
 
+    // 色を設定
+    execute!(
+        stdout(),
+        SetForegroundColor(match options.color.as_str() {
+            "red" => Color::Red,
+            "green" => Color::Green,
+            "blue" => Color::Blue,
+            "yellow" => Color::Yellow,
+            "magenta" => Color::Magenta,
+            "cyan" => Color::Cyan,
+            "white" => Color::White,
+            _ => Color::White,
+        })
+    )?;
+
     loop {
         print!("{}", if is_in_love(x, y, &options) { "vv" } else { "  " });
         if y == half_size - 1 {
@@ -94,6 +113,7 @@ fn draw_love_row_with_message(y: i32, options: &Options) -> Result<bool> {
         x += 1;
     }
 
+    execute!(stdout(), ResetColor)?;
     println!();
 
     if y < rows + heart_size {
