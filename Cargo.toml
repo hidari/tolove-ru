@@ -25,3 +25,7 @@ path = "src/main.rs"
 crossterm = "0.28.1"
 ctrlc = "3.4.5"
 clap = { version = "4.5.23", features = ["derive"] }
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.0"
