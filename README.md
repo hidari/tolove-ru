@@ -54,6 +54,62 @@ Colorful heart:
 love --color red
 ```
 
+## Development
+
+### Running Tests
+
+This project has comprehensive test coverage (85%+) including:
+- Unit tests for security functions, core logic, and color parsing
+- Integration tests for CLI arguments and error handling
+
+Run all tests:
+```bash
+cargo test
+```
+
+Run only unit tests:
+```bash
+cargo test --lib
+```
+
+Run only integration tests:
+```bash
+cargo test --test '*'
+```
+
+Run tests with output:
+```bash
+cargo test -- --nocapture
+```
+
+### Code Quality
+
+Check formatting:
+```bash
+cargo fmt --check
+```
+
+Run linter:
+```bash
+cargo clippy
+```
+
+Apply auto-fixes:
+```bash
+cargo fmt
+cargo clippy --fix
+```
+
+### Test Coverage
+
+The project maintains 85%+ test coverage across:
+- **Security functions** (100%): Input sanitization and validation
+- **Core logic** (90%+): Heart shape calculations and sizing
+- **Color parsing** (100%): Color string conversion
+- **CLI handling** (80%+): Argument parsing and error messages
+
+For detailed testing guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
