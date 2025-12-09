@@ -132,11 +132,10 @@ fn draw_love_row_with_message(y: i32, options: &Options) -> Result<bool> {
                 "  "
             }
         );
-        if y == half_size - 1
-            && x == message_indent {
-                print!("{}", message);
-                x += (message.len() / 2) as i32;
-            }
+        if y == half_size - 1 && x == message_indent {
+            print!("{}", message);
+            x += (message.len() / 2) as i32;
+        }
 
         if x >= heart_size {
             break;
