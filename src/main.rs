@@ -19,7 +19,7 @@ use std::time::Duration;
 #[clap(author, version)]
 #[command(about = ABOUT_MESSAGE)]
 struct Options {
-    #[clap(short, long)]
+    #[clap(short, long, value_parser = validate_message)]
     message: Option<String>,
 
     #[clap(long)]
@@ -27,6 +27,30 @@ struct Options {
 
     #[clap(long, default_value = "white")]
     color: String,
+}
+
+/// Validates and sanitizes the message input
+fn validate_message(s: &str) -> std::result::Result<String, String> {
+    const MAX_MESSAGE_LENGTH: usize = 100;
+
+    if s.len() > MAX_MESSAGE_LENGTH {
+        return Err(format!("Message too long (max {} characters)", MAX_MESSAGE_LENGTH));
+    }
+
+    Ok(sanitize_input(s))
+}
+
+/// Sanitizes input by removing control characters and escape sequences
+fn sanitize_input(input: &str) -> String {
+    input
+        .chars()
+        .filter(|&c| {
+            // Allow printable characters, spaces, tabs, and common punctuation
+            // Filter out control characters (0x00-0x1F, 0x7F-0x9F)
+            let code = c as u32;
+            (code >= 0x20 && code < 0x7F) || c == '\t' || c == '\n'
+        })
+        .collect()
 }
 
 fn main() -> Result<()> {
@@ -43,10 +67,7 @@ fn main() -> Result<()> {
     })
     .expect("Setting Ctrl-C handler failed.");
 
-    let (_, rows) = match size() {
-        Ok((cols, rows)) => (cols, rows),
-        Err(e) => panic!("Error getting terminal size: {:?}", e),
-    };
+    let (_, rows) = size()?;
     execute!(stdout(), MoveTo(0, rows))?;
 
     let mut y = 0;
