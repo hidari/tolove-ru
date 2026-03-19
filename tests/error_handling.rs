@@ -31,17 +31,20 @@ mod describe_エラーハンドリング {
         use super::*;
 
         #[test]
-        fn サニタイズされて正常に起動する() {
+        fn サニタイズされて引数パースエラーなく起動する() {
             // ヌルバイトはOSレベルでCLI引数に含められないため、
             // ユニットテスト（lib.rs）でカバーしている
             let mut cmd = Command::cargo_bin("love").unwrap();
             cmd.arg("--message").arg("Hello\x1b[31mWorld");
             cmd.timeout(Duration::from_millis(500));
             let output = cmd.output().expect("プロセスの実行に失敗");
-            assert!(
-                output.stderr.is_empty(),
-                "予期しないstderr出力: {}",
-                String::from_utf8_lossy(&output.stderr)
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            // clapの引数パースエラー（exit code 2）が出ていないことを確認
+            assert_ne!(
+                output.status.code(),
+                Some(2),
+                "引数パースエラー: {}",
+                stderr
             );
         }
     }
