@@ -28,7 +28,7 @@ mod describe_cli {
                 .arg("--version")
                 .assert()
                 .success()
-                .stdout(predicate::str::contains("1.2.0"));
+                .stdout(predicate::str::contains(env!("CARGO_PKG_VERSION")));
         }
     }
 
