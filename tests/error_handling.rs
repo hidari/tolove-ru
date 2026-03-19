@@ -2,45 +2,50 @@
 
 use assert_cmd::Command;
 use predicates::prelude::*;
+use rstest::rstest;
+use std::time::Duration;
 
-#[test]
-fn test_message_too_long_error() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    let long_message = "a".repeat(101);
-    cmd.arg("--message").arg(&long_message);
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("Message too long"))
-        .stderr(predicate::str::contains("max 100 characters"));
-}
+mod describe_エラーハンドリング {
+    use super::*;
 
-#[test]
-fn test_message_dos_attack() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    // 10億文字は作れないので、明らかに長いメッセージでテスト
-    let long_message = "a".repeat(1000);
-    cmd.arg("--message").arg(&long_message);
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("Message too long"));
-}
+    mod メッセージが最大長を超える場合 {
+        use super::*;
 
-#[test]
-fn test_message_with_escape_sequences() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    // ANSIエスケープシーケンスを含むメッセージ
-    cmd.arg("--message").arg("Hello\x1b[31mWorld");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    // エスケープシーケンスは除去されるが、プログラムは正常に動作する
-    let _ = cmd.ok();
-}
+        #[rstest]
+        #[case::境界値超過(101)]
+        #[case::dos攻撃(1000)]
+        fn エラーメッセージを表示して終了する(#[case] length: usize) {
+            let msg = "a".repeat(length);
+            Command::cargo_bin("love")
+                .unwrap()
+                .arg("--message")
+                .arg(&msg)
+                .assert()
+                .failure()
+                .stderr(predicate::str::contains("Message too long"))
+                .stderr(predicate::str::contains("max 100 characters"));
+        }
+    }
 
-#[test]
-fn test_message_with_null_byte() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    // NULL文字を含むメッセージ
-    cmd.arg("--message").arg("Hello\x00World");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    // NULL文字は除去されるが、プログラムは正常に動作する
-    let _ = cmd.ok();
+    mod エスケープシーケンスを含むメッセージの場合 {
+        use super::*;
+
+        #[test]
+        fn サニタイズされて引数パースエラーなく起動する() {
+            // ヌルバイトはOSレベルでCLI引数に含められないため、
+            // ユニットテスト（lib.rs）でカバーしている
+            let mut cmd = Command::cargo_bin("love").unwrap();
+            cmd.arg("--message").arg("Hello\x1b[31mWorld");
+            cmd.timeout(Duration::from_millis(500));
+            let output = cmd.output().expect("プロセスの実行に失敗");
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            // clapの引数パースエラー（exit code 2）が出ていないことを確認
+            assert_ne!(
+                output.status.code(),
+                Some(2),
+                "引数パースエラー: {}",
+                stderr
+            );
+        }
+    }
 }

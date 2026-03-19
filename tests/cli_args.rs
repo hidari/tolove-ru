@@ -2,93 +2,94 @@
 
 use assert_cmd::Command;
 use predicates::prelude::*;
+use rstest::rstest;
+use std::time::Duration;
 
-#[test]
-fn test_cli_help() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("--help");
-    cmd.assert().success().stdout(predicate::str::contains(
-        "A lovely terminal heart animation",
-    ));
-}
+mod describe_cli {
+    use super::*;
 
-#[test]
-fn test_cli_version() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("--version");
-    cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("1.2.0"));
-}
+    mod ヘルプとバージョン表示 {
+        use super::*;
 
-#[test]
-fn test_cli_invalid_option() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("--invalid");
-    cmd.assert().failure();
-}
+        #[test]
+        fn helpフラグでヘルプメッセージを表示する() {
+            Command::cargo_bin("love")
+                .unwrap()
+                .arg("--help")
+                .assert()
+                .success()
+                .stdout(predicate::str::contains(
+                    "A lovely terminal heart animation",
+                ));
+        }
 
-#[test]
-fn test_cli_message_too_long() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    let long_message = "a".repeat(101);
-    cmd.arg("--message").arg(&long_message);
-    cmd.assert()
-        .failure()
-        .stderr(predicate::str::contains("Message too long"));
-}
+        #[test]
+        fn versionフラグでバージョンを表示する() {
+            Command::cargo_bin("love")
+                .unwrap()
+                .arg("--version")
+                .assert()
+                .success()
+                .stdout(predicate::str::contains("1.2.0"));
+        }
+    }
 
-#[test]
-fn test_cli_color_option() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("--color").arg("red");
-    // 色オプションは正常に解析される（実行中断にCtrl+Cが必要なので、実際の動作検証は難しい）
-    // ここでは、引数が正しく解析されることを確認
-    cmd.timeout(std::time::Duration::from_millis(100));
-    // タイムアウトまたは成功のいずれか
-    let _ = cmd.ok();
-}
+    mod 不正なオプションの場合 {
+        use super::*;
 
-#[test]
-fn test_cli_petite_flag() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("--petite");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    let _ = cmd.ok();
-}
+        #[test]
+        fn エラーで終了する() {
+            Command::cargo_bin("love")
+                .unwrap()
+                .arg("--invalid")
+                .assert()
+                .failure();
+        }
+    }
 
-#[test]
-fn test_cli_message_short() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("-m").arg("Test");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    let _ = cmd.ok();
-}
+    mod メッセージが長すぎる場合 {
+        use super::*;
 
-#[test]
-fn test_cli_message_long() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("--message").arg("Test");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    let _ = cmd.ok();
-}
+        #[test]
+        fn エラーメッセージを表示して終了する() {
+            let long_message = "a".repeat(101);
+            Command::cargo_bin("love")
+                .unwrap()
+                .arg("--message")
+                .arg(&long_message)
+                .assert()
+                .failure()
+                .stderr(predicate::str::contains("Message too long"));
+        }
+    }
 
-#[test]
-fn test_cli_combined_options() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("-m")
-        .arg("Love")
-        .arg("--petite")
-        .arg("--color")
-        .arg("magenta");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    let _ = cmd.ok();
-}
+    mod 有効なオプションで起動した場合 {
+        use super::*;
 
-#[test]
-fn test_cli_message_with_ascii() {
-    let mut cmd = Command::cargo_bin("love").unwrap();
-    cmd.arg("-m").arg("Hello World");
-    cmd.timeout(std::time::Duration::from_millis(100));
-    let _ = cmd.ok();
+        #[rstest]
+        #[case::色オプション(&["--color", "red"])]
+        #[case::petiteフラグ(&["--petite"])]
+        #[case::短縮メッセージ(&["-m", "Test"])]
+        #[case::長形式メッセージ(&["--message", "Test"])]
+        #[case::スペース含むメッセージ(&["-m", "Hello World"])]
+        #[case::全オプション組み合わせ(&["-m", "Love", "--petite", "--color", "magenta"])]
+        fn 引数パースエラーなく起動する(#[case] args: &[&str]) {
+            let mut cmd = Command::cargo_bin("love").unwrap();
+            for arg in args {
+                cmd.arg(arg);
+            }
+            cmd.timeout(Duration::from_millis(500));
+            let output = cmd.output().expect("プロセスの実行に失敗");
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            // clapの引数パースエラー（exit code 2）が出ていないことを確認
+            // CI環境ではターミナル操作のエラーがstderrに出る場合があるため、
+            // stderr空チェックではなくexit codeで判定する
+            assert_ne!(
+                output.status.code(),
+                Some(2),
+                "引数パースエラー: {}",
+                stderr
+            );
+        }
+    }
 }

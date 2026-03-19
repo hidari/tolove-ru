@@ -17,6 +17,10 @@ include = [
     "LICENSE"
 ]
 
+[lib]
+name = "tolove_ru"
+path = "src/lib.rs"
+
 [[bin]]
 name = "love"
 path = "src/main.rs"
@@ -29,3 +33,4 @@ clap = { version = "4.5.23", features = ["derive"] }
 [dev-dependencies]
 assert_cmd = "2.0"
 predicates = "3.0"
+rstest = "0.23"
