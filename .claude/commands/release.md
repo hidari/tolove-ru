@@ -12,6 +12,7 @@
    - `main` ブランチにいることを確認（違う場合はエラー）
    - ワーキングツリーがクリーンであることを確認
    - `git pull` で最新状態に更新
+   - `gh run list -w CI -b main -L 1 --json conclusion --jq '.[0].conclusion'` で main の最新 CI が `success` であることを確認（失敗またはin_progressの場合はエラーで終了）
    - `cargo fmt --check` でフォーマット確認
    - `cargo clippy -- -D warnings` でlint確認
    - `cargo test` でテスト実行
