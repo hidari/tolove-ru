@@ -1,6 +1,6 @@
 [package]
 name = "tolove-ru"
-version = "1.2.0"
+version = "1.2.1"
 edition = "2021"
 authors = ["Hidari <ika5140+github@gmail.com>"]
 description = "A lovely terminal heart animation."
