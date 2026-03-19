@@ -26,11 +26,11 @@ name = "love"
 path = "src/main.rs"
 
 [dependencies]
-crossterm = "0.28.1"
-ctrlc = "3.4.5"
-clap = { version = "4.5.23", features = ["derive"] }
+crossterm = "=0.29.0"
+ctrlc = "=3.5.2"
+clap = { version = "=4.6.0", features = ["derive"] }
 
 [dev-dependencies]
-assert_cmd = "2.0"
-predicates = "3.0"
-rstest = "0.23"
+assert_cmd = "=2.2.0"
+predicates = "=3.1.4"
+rstest = "=0.26.1"
